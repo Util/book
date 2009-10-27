@@ -1,5 +1,6 @@
 CHAPTERS = \
     src/preface.pod \
+    src/subs.pod \
     src/multi-dispatch.pod \
     src/classes-and-objects.pod \
     src/regexes.pod \
