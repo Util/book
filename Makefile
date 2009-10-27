@@ -1,8 +1,9 @@
-CHAPTERS = src/preface.pod \
-		  src/multi-dispatch.pod \
-		  src/classes-and-objects.pod \
-		  src/regexes.pod \
-		  src/grammars.pod
+CHAPTERS = \
+    src/preface.pod \
+    src/multi-dispatch.pod \
+    src/classes-and-objects.pod \
+    src/regexes.pod \
+    src/grammars.pod
 
 # If you're on a Mac, and installed Inkscape via MacPorts, you might want to
 # manually uncomment the next line, and remove the one after it.
