@@ -1,0 +1,141 @@
+=head0 Subs
+
+=begin comments
+
+XXX Can't find appropriate examples from JSON::Tiny;
+    using temperature code from Atlanta.pm's Perl5 Parameters class.
+
+XXX Review all examples for clarity, and more real-world tie-ins.
+
+Pre-reqs we need to cover before this chapter (or remove from this chapter):
+    post-fix statements, ternary expression, pick, given/when
+
+=end comments
+
+Subroutines (subs) are the foundation of structured programming, enabling
+code reuse, relocation, and abstraction. Perl 6 has many features that make
+subroutines powerful, yet easy to write.
+
+Inside a sub, Perl 6 allows you to:
+
+=over 4
+
+=item * Short-cut your control flow [Multiple return]
+
+=item * Invoke yourself again with different parameters [Recursion]
+
+=item * Find out who called you [caller()]
+
+=item * Refer to yourself, even if the sub has no name [&?ROUTINE]
+
+=item * Discover the details of the sub you are currently running, at run-time [Introspection]
+
+=back
+
+At the border of a sub, Perl 6 allows you to:
+
+=over 4
+
+=item * Specify what data you expect to receive, and what you will return [Signatures, Typed parameters, Typed returns]
+
+=item * Receive a varying number of arguments [Optional parameters]
+
+=item * Use a longer form of calling syntax for clarity [Named parameters]
+
+=item * Describe your parameters in an abbreviated form [Placeholder variables]
+
+=item * Modify some of the passed-in data directly, and protect other data from accidental modification [Read-only and Read-write parameters, Parameter Properties]
+
+=item * Return more than one datum in a single call [List return]
+
+=item * Return different data depending on how the returned data will be used [Context]
+
+=item * Roll-your-own more complex parameter-passing scheme, or mimic Perl 5's scheme [@_]
+
+=back
+
+Outside a sub, Perl 6 allows you to:
+
+=over 4
+
+=item * Discover the details of a sub at run-time [Introspection]
+
+=item * Create and use subs that need no names [Anonymous subs]
+
+=item * Use subs as arguments to other subs [First-class functions]
+
+=item * Temporarily add code to run before or after a sub that you otherwise can't modify [Wrapping]
+
+=item * Override a sub only for a particular time in your program's execution [local()]
+
+=item * Override or create a sub only for a particular space in your code [Lexical subs]
+
+=item * Use a sub as if it was a built-in feature [Export/Import]
+
+=item * Create a shortcut to a sub, to always be called with common arguments [Currying]
+
+=back
+
+Perl 6 lets you write multiple subs that all have the same name, and figures
+out which one to call based on the arguments passed. These are called C<multi>
+subs, and are covered in the next chapter.
+
+Perl 6 also allows two radically new options for control flow: co-routines and
+continuations. They are not covered in this book.
+
+=head1 Control flow
+
+    sub am_i_lucky {
+        my $die1 = (1..6).pick;
+        my $die2 = (1..6).pick;
+
+    #   return ( ( $die1==6 && $die2==6 ) ?? 'lucky' !! 'not lucky' );
+
+        if $die1 != 6 {
+            return 'not lucky';
+        }
+        return 'not lucky' if $die2 != 6;
+        return 'lucky';
+    }
+
+    say 'You are ', am_i_lucky();
+
+In the code above, the sub expects nothing to be passed to it, and then rolls
+a pair of dice. If it rolls double-sixes, then it judges you "lucky".
+
+If the commented-out line were uncommented, then the code beneath it would not
+be needed; the whole result can be computed and returned in a single final
+line of the sub. However, it is often useful to have multiple exit points from
+a sub. Perl 6 allows multiple C<return> statements; control goes back to the
+caller upon from the first C<return> that gets executed.
+
+Notice also that C<return> can be used with postfix conditions, like C<if>,
+C<unless>, and C<when>.
+
+=head1 Simple positional parameters
+
+    sub convert_temperature_from_F_or_C_to_K ( $tempe, $type ) {
+        given uc $type {
+            when 'F' {
+                return (5/9)*( $tempe - 32 ) + 273.15;
+            }
+            when 'C' {
+                return $tempe + 273.15;
+            }
+        }
+        die "Type '$type' was not 'F' or 'C'";
+    }
+
+    say '212 degrees Fahrenheit is ', convert_temperature_from_F_or_C_to_K( 212, 'F' ), ' Kelvin';
+
+This prints:
+
+    212 degrees Fahrenheit is 373.15 Kelvin
+
+When the sub is called, the first item inside the parenthesis is placed in the
+C<$tempe> variable, and the second item into C<$type>. The sub expects exactly
+two items of data to be passed. If you call the sub with 0, 1, 3, or 87 arguments,
+Perl 6 will halt your program with an error; something like:
+
+    too many arguments passed (87) - 2 params expected
+        in sub convert_temperature_from_F_or_C_to_K
